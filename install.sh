@@ -111,7 +111,7 @@ mv "$WORK/engine/wswine.bundle" "$CONTENTSFOLD/SharedSupport/wine"
 
 cp "$REPO"/bundle/Scripts/* "$CONTENTSFOLD/Resources/Scripts/"
 chmod +x "$CONTENTSFOLD"/Resources/Scripts/*.sh "$CONTENTSFOLD/Resources/Scripts/StartupScript"
-cp "$REPO/bundle/steamwebhelper-shim.exe" "$CONTENTSFOLD/Resources/"
+cp "$REPO/bundle/steamwebhelper-shim.exe" "$REPO/THIRD-PARTY-NOTICES.md" "$CONTENTSFOLD/Resources/"
 # A repo downloaded as a zip in a browser carries quarantine flags; clear them app-wide.
 xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 

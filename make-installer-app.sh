@@ -28,8 +28,8 @@ fi
 osacompile -o "$APP" "$src"
 
 mkdir -p "$APP/Contents/Resources/installer"
-cp "$REPO/install.sh" "$APP/Contents/Resources/installer/"
-cp -R "$REPO/bundle" "$APP/Contents/Resources/installer/"
+cp "$REPO/install.sh" "$REPO/LICENSE" "$REPO/THIRD-PARTY-NOTICES.md" "$APP/Contents/Resources/installer/"
+rsync -a --exclude '.DS_Store' "$REPO/bundle" "$APP/Contents/Resources/installer/"
 
 PLIST="$APP/Contents/Info.plist"
 plutil -replace CFBundleIdentifier -string "local.installer.order-of-the-sinking-star" "$PLIST"
@@ -40,7 +40,8 @@ codesign --force --deep --sign - "$APP"
 codesign --verify --deep --strict "$APP"
 
 if [[ -z "$TEST_DEST" ]]; then
-    (cd "$OUT" && ditto -c -k --keepParent "$NAME.app" "$NAME.zip")
+    # No resource forks or extended attributes, so no ._ files in the zip.
+    (cd "$OUT" && ditto -c -k --norsrc --noextattr --keepParent "$NAME.app" "$NAME.zip")
     echo "Built $OUT/$NAME.zip"
 else
     echo "Built test installer (installs into $TEST_DEST): $APP"

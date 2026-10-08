@@ -1,17 +1,12 @@
 #!/bin/sh
-cd "$(dirname "$0")/../../"
-CONTENTSFOLD="$PWD"
-####################################################
-# this script will run when Sikarugir is starting up
-# before the X server or Wine starts
-# $CONTENTSFOLD is the full path to the current
-#       contents folder in the wrapper.
-####################################################
+# The Sikarugir launcher runs this on every launch of the app, before Wine starts.
+CONTENTSFOLD=$(cd "$(dirname "$0")/../.." && pwd)
+SCRIPTS="$CONTENTSFOLD/Resources/Scripts"
 
-"$CONTENTSFOLD/Resources/Scripts/reshim-steamwebhelper.sh" "$CONTENTSFOLD"
+"$SCRIPTS/reshim-steamwebhelper.sh" "$CONTENTSFOLD"
 
 # Switch to the game's icon once the game is installed (no-op after the first time).
-"$CONTENTSFOLD/Resources/Scripts/make-icon.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
+"$SCRIPTS/make-icon.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
 
 # Shows Steam's Downloads page during installs, quits Steam when the game exits.
-nohup "$CONTENTSFOLD/Resources/Scripts/steam-session.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
+nohup "$SCRIPTS/steam-session.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &

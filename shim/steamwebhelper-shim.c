@@ -16,8 +16,11 @@
 #include <wchar.h>
 #include <stdlib.h>
 
-#define EXTRA_FLAGS L"--disable-gpu --single-process"
-#define REAL_BINARY L"steamwebhelper_real.exe"
+#define CEF_FLAGS L"--disable-gpu --single-process"
+#define VALVE_HELPER L"steamwebhelper_real.exe"
+
+// Lets reshim-steamwebhelper.sh tell this shim (any version) apart from Valve's helper.
+__attribute__((used)) static const char shim_marker[] = "sinking-star-mac steamwebhelper shim";
 
 // Returns the part of the command line after argv[0], honoring quotes.
 static const wchar_t *skip_argv0(const wchar_t *cmd)
@@ -43,15 +46,15 @@ int wmain(void)
     slash[1] = 0;
 
     wchar_t real[MAX_PATH];
-    if (wcslen(self) + wcslen(REAL_BINARY) >= MAX_PATH) return 1;
+    if (wcslen(self) + wcslen(VALVE_HELPER) >= MAX_PATH) return 1;
     wcscpy(real, self);
-    wcscat(real, REAL_BINARY);
+    wcscat(real, VALVE_HELPER);
 
     const wchar_t *args = skip_argv0(GetCommandLineW());
-    size_t n = wcslen(real) + wcslen(EXTRA_FLAGS) + wcslen(args) + 8;
+    size_t n = wcslen(real) + wcslen(CEF_FLAGS) + wcslen(args) + 8;
     wchar_t *cmdline = malloc(n * sizeof(wchar_t));
     if (!cmdline) return 1;
-    swprintf(cmdline, n, L"\"%ls\" %ls %ls", real, EXTRA_FLAGS, args);
+    swprintf(cmdline, n, L"\"%ls\" %ls %ls", real, CEF_FLAGS, args);
 
     STARTUPINFOW si = {sizeof(si)};
     PROCESS_INFORMATION pi;

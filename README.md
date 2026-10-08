@@ -9,7 +9,8 @@ Nothing here contains the game or Steam. The installer downloads the wrapper pie
 their original projects, and Steam installs the game under your own account, so you need
 to own it on Steam.
 
-Not affiliated with Thekla, Valve or Apple.
+Not affiliated with Thekla, Valve or Apple. Order of the Sinking Star is a trademark of
+Thekla, Inc.; Steam is a trademark of Valve Corporation.
 
 ## Requirements
 
@@ -145,4 +146,5 @@ DirectX 12 stack reports.
   downloads; this repo doesn't redistribute it.
 - The single-process webhelper approach comes from
   [steam-on-m1-wine](https://github.com/Arime9/steam-on-m1-wine).
-- This repo's scripts and shim are MIT licensed (see `LICENSE`).
+- This repo's scripts and shim are MIT licensed (see `LICENSE`). The prebuilt shim includes
+  compiler runtime code under its own terms; see `THIRD-PARTY-NOTICES.md`.
