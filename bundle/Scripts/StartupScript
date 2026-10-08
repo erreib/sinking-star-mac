@@ -1,0 +1,14 @@
+#!/bin/sh
+cd "$(dirname "$0")/../../"
+CONTENTSFOLD="$PWD"
+####################################################
+# this script will run when Sikarugir is starting up
+# before the X server or Wine starts
+# $CONTENTSFOLD is the full path to the current
+#       contents folder in the wrapper.
+####################################################
+
+"$CONTENTSFOLD/Resources/Scripts/reshim-steamwebhelper.sh" "$CONTENTSFOLD"
+
+# Shut the Windows Steam down once the game exits.
+nohup "$CONTENTSFOLD/Resources/Scripts/quit-steam-after-game.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
