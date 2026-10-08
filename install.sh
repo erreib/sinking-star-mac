@@ -40,11 +40,11 @@ failed=0
 status() { [[ -z "$STATUS_FILE" ]] || print -r -- "$1" >> "$STATUS_FILE"; }
 step() {
     step_no=$((step_no + 1))
-    print -P "%B==>%b $1"
+    print -nP "%B==>%b "; print -r -- "$1"
     status "step|$step_no|$TOTAL_STEPS|$1"
 }
 die() {
-    print -P "%F{red}Error:%f $1" >&2
+    { print -nP "%F{red}Error:%f "; print -r -- "$1"; } >&2
     failed=1
     status "error|$1"
     exit 1
@@ -154,7 +154,7 @@ ss_wine "$WORK/SteamSetup.exe" /S >> "$LOG" 2>&1
 # Steam downloads the rest of itself (including its CEF webhelper) on first run.
 # Let that finish here so the shim is in place before the first real launch.
 # No -noverifyfiles this time: with it, a fresh install skips the download entirely.
-step "Letting Steam update itself (a few hundred MB)"
+step "Letting Steam update itself (about 500 MB)"
 (cd "$SS_STEAM_DIR" && ss_wine "$SS_STEAM_EXE" -no-cef-sandbox -cef-disable-gpu >> "$LOG" 2>&1 &)
 for i in {1..450}; do
     [[ -f "$SS_STEAM_DIR/bin/cef/cef.win64/steamwebhelper.exe" ]] &&
@@ -169,7 +169,7 @@ ss_wineserver -w 2>/dev/null || true
 
 built=1
 status "done|$APP"
-print -P "%B==>%b Done: $APP"
+print -nP "%B==>%b "; print -r -- "Done: $APP"
 cat <<EOF
 
 Next:

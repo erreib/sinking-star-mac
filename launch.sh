@@ -8,7 +8,8 @@
 # If the wrapper's Windows Steam is already running, the game is started directly
 # (SteamAppId tells steam_api to attach to that Steam instead of relaunching through
 # it), so per-launch variables like the HUD apply. Otherwise Steam is started with
-# the variables set and launches the game itself, the way the app bundle does.
+# the variables set and launches the game itself, with the same session helper the
+# app bundle uses (Downloads page, auto-quit).
 source "${0:A:h}/env.sh"
 "$CONTENTSFOLD/Resources/Scripts/reshim-steamwebhelper.sh" "$CONTENTSFOLD"
 
@@ -21,11 +22,14 @@ mkdir -p "$SS_LOGS"
 log="$SS_LOGS/game-$(date +%Y%m%d-%H%M%S).log"
 game_dir="$SS_STEAM_DIR/steamapps/common/Order of the Sinking Star"
 
-if pgrep -f 'Steam\\steam.exe' >/dev/null; then
+if pgrep -f '^C:\\.*\\Steam\\steam\.exe' >/dev/null; then
     cd "$game_dir"
-    SteamAppId=$SS_APPID SteamGameId=$SS_APPID ss_wine sinking_star.exe >> "$log" 2>&1 &!
+    # Full Windows path, so the session helper (which matches it) sees the game.
+    SteamAppId=$SS_APPID SteamGameId=$SS_APPID \
+        ss_wine 'C:\Program Files (x86)\Steam\steamapps\common\Order of the Sinking Star\sinking_star.exe' >> "$log" 2>&1 &!
 else
+    nohup "$CONTENTSFOLD/Resources/Scripts/steam-session.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &!
     cd "$SS_STEAM_DIR"
-    ss_wine "$SS_STEAM_EXE" ${=SS_STEAM_FLAGS} "steam://rungameid/$SS_APPID" >> "$log" 2>&1 &!
+    ss_wine "$SS_STEAM_EXE" ${=SS_STEAM_FLAGS} -silent "steam://rungameid/$SS_APPID" >> "$log" 2>&1 &!
 fi
 echo "launched; log: $log"

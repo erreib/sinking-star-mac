@@ -22,7 +22,7 @@ on run
 	end if
 
 	display dialog "This sets up " & gameName & " to run on your Mac, using the Windows version of Steam with Wine and Apple's D3DMetal." & return & return & ¬
-		"It downloads about 500 MB and builds the app in your Applications folder. Then you sign in to Steam, which downloads the game (about 11 GB). You need to own the game on Steam." ¬
+		"It downloads about 800 MB and builds the app in your Applications folder. Then you sign in to Steam, which downloads the game (about 11 GB). You need to own the game on Steam." ¬
 		buttons {"Cancel", "Install"} default button "Install" cancel button "Cancel" with title windowTitle
 
 	-- Rosetta 2 runs the Windows (Intel) parts of the stack.

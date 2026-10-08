@@ -19,13 +19,28 @@ MANIFEST="$SS_STEAM_DIR/steamapps/appmanifest_$SS_APPID.acf"
 GAME='^C:\\.*\\sinking_star\.exe'
 STEAM='^C:\\.*\\Steam\\steam\.exe'
 
-LOG="$HOME/Library/Logs/Order of the Sinking Star - session.log"
+LOG="${SS_SESSION_LOG:-$HOME/Library/Logs/Order of the Sinking Star - session.log}"
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG"; }
 : > "$LOG"
 log "started for $CONTENTSFOLD"
 
 steam_url() { log "sending $1"; (cd "$SS_STEAM_DIR" && ss_wine "$SS_STEAM_EXE" "$1" >/dev/null 2>&1); }
 installed() { grep -Eq '"StateFlags"[[:space:]]+"4"' "$MANIFEST" 2>/dev/null; }
+# Steam briefly disappears when it restarts itself to apply a client update, so it only
+# counts as gone if it hasn't come back after 20 s.
+steam_gone() {
+    pgrep -f "$STEAM" >/dev/null && return 1
+    sleep 20
+    ! pgrep -f "$STEAM" >/dev/null
+}
+# Steam's client crashes on its way out under Wine, and its crash reporter and
+# background service then keep the Wine session (and the menu-bar icon) alive for a
+# minute or two. Nothing else in this prefix needs to keep running, so end it.
+end_session() {
+    log "ending the Wine session ($1)"
+    ss_wineserver -k
+    exit 0
+}
 
 # Wine and Steam start after this script; give them time to appear.
 waited=0
@@ -40,7 +55,7 @@ downloading=0
 was_installed=0
 installed && was_installed=1
 until pgrep -f "$GAME" >/dev/null; do
-    pgrep -f "$STEAM" >/dev/null || { log "Steam exited before the game started"; exit 0; }
+    steam_gone && end_session "Steam was quit before the game started"
     if [ "$downloading" = 0 ] && [ -f "$MANIFEST" ] && ! installed; then
         steam_url "steam://open/downloads"
         downloading=1
@@ -66,14 +81,11 @@ done
 log "game exited; shutting Steam down"
 cd "$SS_STEAM_DIR" && ss_wine "$SS_STEAM_EXE" -shutdown >> "$LOG" 2>&1
 
-# Steam's client crashes on its way out under Wine, and its crash reporter and
-# background service then keep the Wine session (and the menu-bar icon) alive for
-# a minute or two. Cloud saves sync when the game exits, so once the client itself
-# is gone, or after 60 s if it hangs, end this app's Wine session.
+# Cloud saves sync when the game exits, so once the client itself is gone, or after
+# 60 s if it hangs, nothing is lost by ending the session.
 waited=0
 while pgrep -f "$STEAM" >/dev/null && [ "$waited" -lt 60 ]; do
     sleep 2
     waited=$((waited + 2))
 done
-log "Steam client gone after ${waited}s; ending the Wine session"
-ss_wineserver -k
+end_session "Steam client gone after ${waited}s"

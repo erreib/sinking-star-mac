@@ -102,8 +102,8 @@ The game writes its own log, including frame-time stats, to
   when it runs as a single process, and Steam ignores its own `-cef-single-process`
   option. `shim/steamwebhelper-shim.c` stands in for `steamwebhelper.exe` and re-launches
   Valve's binary with `--disable-gpu --single-process`.
-- **Sharpness:** Wine's Mac driver runs in Retina mode with 200% Windows scaling, so the
-  game sees the panel's real resolution.
+- **Sharpness:** on a Retina main display, Wine's Mac driver runs in Retina mode with 200%
+  Windows scaling, so the game sees the panel's real resolution.
 - **Steam overlay:** disabled, since it commonly hangs DirectX startup under Wine.
 - **Steam session:** Steam runs with `-silent`, so its main window and Special Offers popup
   stay hidden, and it holds the app's launch request until you've signed in (without it,
@@ -117,12 +117,24 @@ The game writes its own log, including frame-time stats, to
   draws it on a macOS-style rounded tile (JavaScript for Automation) and packs it with
   `iconutil`. All three ship with macOS.
 
+- **Downloads:** the Sikarugir template and engine are pinned to exact versions and checked
+  against SHA-256 hashes; `SteamSetup.exe` comes from Valve's CDN. The installer clears
+  macOS's quarantine flag on the app it builds, so macOS doesn't ask about each Wine
+  component the first time it runs.
+
 `bundle/` is copied into the app; `bundle/steamwebhelper-shim.exe` is built from `shim/`
 with mingw-w64 (the command is at the top of the source file). The installer app is an
 AppleScript applet (`installer/Installer.applescript`) that runs `install.sh` with
 `--status-file` and shows its progress; `./make-installer-app.sh` builds it and the
-release zip into `dist/`. `tools/d3d12probe.c` is a
-small diagnostic that prints what the DirectX 12 stack reports.
+release zip into `dist/`. `tools/d3d12probe.c` is a small diagnostic that prints what the
+DirectX 12 stack reports.
+
+## Known limitations
+
+- Tested on one Mac so far (M4 Pro, macOS 15.7, October 2026 game and Steam builds).
+- D3DMetal 4.0 is a beta, and the Steam webhelper workaround depends on how Steam's
+  client is built. A Steam, game or macOS update can break either.
+- The app needs about 20 seconds after you quit the game to close Steam completely.
 
 ## Credits and licenses
 
