@@ -49,7 +49,8 @@ Options:
 
 1. Open **Order of the Sinking Star** from Applications, Spotlight or Launchpad.
 2. Sign in to Steam. The window can take up to a minute to appear.
-3. Steam offers to install the game (about 11 GB download). When it's done, press **Play**.
+3. Steam offers to install the game (about 11 GB download) and shows the download. The game
+   starts when it's done.
 
 After that, opening the app goes straight into the game, and Steam shuts itself down
 (after syncing cloud saves) when you quit. Once the game is installed, the app also
@@ -101,8 +102,11 @@ The game writes its own log, including frame-time stats, to
 - **Sharpness:** Wine's Mac driver runs in Retina mode with 200% Windows scaling, so the
   game sees the panel's real resolution.
 - **Steam overlay:** disabled, since it commonly hangs DirectX startup under Wine.
-- **Auto-quit:** `bundle/Scripts/quit-steam-after-game.sh` shuts Steam down once the game
-  exits.
+- **Steam session:** Steam runs with `-silent`, so its main window and Special Offers popup
+  stay hidden, and it holds the app's launch request until you've signed in (without it,
+  Steam acts on the request before sign-in and drops it). `bundle/Scripts/steam-session.sh`
+  shows Steam's Downloads page while the game downloads or updates, starts the game after
+  the first download, and shuts Steam down once the game exits.
 - **Icon:** the installer can't ship the game's artwork, so once Steam has installed the
   game, `bundle/Scripts/make-icon.sh` pulls the icon out of `sinking_star.exe` (Perl),
   draws it on a macOS-style rounded tile (JavaScript for Automation) and packs it with

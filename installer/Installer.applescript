@@ -72,7 +72,7 @@ on run
 	set progress completed steps to progress total steps
 	set progress additional description to "Done"
 	set answer to button returned of (display dialog gameName & " is installed in your Applications folder." & return & return & ¬
-		"Next, open it and sign in to Steam. Steam offers to install the game; when that's done, press Play. Later launches go straight into the game." & return & return & ¬
+		"Next, open it and sign in to Steam. Steam then offers to install the game and shows the download; the game starts when it's done. Later launches go straight into the game." & return & return & ¬
 		"Tip: Settings > Resolution > 1440p is a good balance of sharpness and frame rate." ¬
 		buttons {"Later", "Open Now"} default button "Open Now" with title windowTitle)
 	if answer is "Open Now" then do shell script "open " & quoted form of targetApp

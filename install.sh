@@ -122,7 +122,9 @@ plutil -replace CFBundleIdentifier -string "local.wrapper.order-of-the-sinking-s
 plutil -replace D3DMETAL -integer 1 "$PLIST"
 plutil -replace WINEDEBUG -string "-all" "$PLIST"
 plutil -replace "Program Name and Path" -string "/Program Files (x86)/Steam/steam.exe" "$PLIST"
-plutil -replace "Program Flags" -string "$SS_STEAM_FLAGS steam://rungameid/$SS_APPID" "$PLIST"
+# -silent hides Steam's main window and Special Offers popup; steam-session.sh shows
+# the Downloads page when there's something to watch.
+plutil -replace "Program Flags" -string "$SS_STEAM_FLAGS -silent steam://rungameid/$SS_APPID" "$PLIST"
 
 step "Creating the Windows environment (Wine prefix)"
 "$CONTENTSFOLD/MacOS/wineskinlauncher" WSS-wineprefixcreate >> "$LOG" 2>&1
@@ -173,9 +175,9 @@ cat <<EOF
 Next:
   1. Open "$APP_NAME" (Applications folder, Spotlight or Launchpad).
   2. Sign in to Steam in the window that appears (it can take up to a minute).
-  3. Steam offers to install Order of the Sinking Star (about 11 GB). Once it's
-     installed, press Play. Later launches go straight into the game, and Steam
-     closes itself when you quit.
+  3. Steam then offers to install Order of the Sinking Star (about 11 GB) and shows
+     the download. The game starts when it's done. Later launches go straight into
+     the game, and Steam closes itself when you quit.
 
 Tip: Settings > Resolution "1440p" is a good balance of sharpness and frame rate.
 EOF

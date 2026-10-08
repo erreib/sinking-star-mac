@@ -13,5 +13,5 @@ CONTENTSFOLD="$PWD"
 # Switch to the game's icon once the game is installed (no-op after the first time).
 "$CONTENTSFOLD/Resources/Scripts/make-icon.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
 
-# Shut the Windows Steam down once the game exits.
-nohup "$CONTENTSFOLD/Resources/Scripts/quit-steam-after-game.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
+# Shows Steam's Downloads page during installs, quits Steam when the game exits.
+nohup "$CONTENTSFOLD/Resources/Scripts/steam-session.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
