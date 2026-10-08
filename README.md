@@ -40,7 +40,8 @@ it Steam updating itself. Options:
 3. Steam offers to install the game (about 11 GB download). When it's done, press **Play**.
 
 After that, opening the app goes straight into the game, and Steam shuts itself down
-(after syncing cloud saves) when you quit.
+(after syncing cloud saves) when you quit. Once the game is installed, the app also
+switches to the game's own icon.
 
 ## Performance
 
@@ -90,6 +91,10 @@ The game writes its own log, including frame-time stats, to
 - **Steam overlay:** disabled, since it commonly hangs DirectX startup under Wine.
 - **Auto-quit:** `bundle/Scripts/quit-steam-after-game.sh` shuts Steam down once the game
   exits.
+- **Icon:** the installer can't ship the game's artwork, so once Steam has installed the
+  game, `bundle/Scripts/make-icon.sh` pulls the icon out of `sinking_star.exe` (Perl),
+  draws it on a macOS-style rounded tile (JavaScript for Automation) and packs it with
+  `iconutil`. All three ship with macOS.
 
 `bundle/` is copied into the app; `bundle/steamwebhelper-shim.exe` is built from `shim/`
 with mingw-w64 (the command is at the top of the source file). `tools/d3d12probe.c` is a

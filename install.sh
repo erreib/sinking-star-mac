@@ -84,11 +84,12 @@ mkdir "$WORK/engine" && tar -xJf "$WORK/engine.tar.xz" -C "$WORK/engine"
 mv "$WORK"/Template-*.app "$APP"
 CONTENTSFOLD="$APP/Contents"
 mv "$WORK/engine/wswine.bundle" "$CONTENTSFOLD/SharedSupport/wine"
-xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 
 cp "$REPO"/bundle/Scripts/* "$CONTENTSFOLD/Resources/Scripts/"
 chmod +x "$CONTENTSFOLD"/Resources/Scripts/*.sh "$CONTENTSFOLD/Resources/Scripts/StartupScript"
 cp "$REPO/bundle/steamwebhelper-shim.exe" "$CONTENTSFOLD/Resources/"
+# A repo downloaded as a zip in a browser carries quarantine flags; clear them app-wide.
+xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 
 PLIST="$CONTENTSFOLD/Info.plist"
 . "$CONTENTSFOLD/Resources/Scripts/wine-env.sh"

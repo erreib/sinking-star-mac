@@ -23,6 +23,9 @@ until pgrep -f "$GAME" >/dev/null; do
     sleep 3
 done
 
+# The game is installed by now, so the app can take its icon (first play session).
+"$CONTENTSFOLD/Resources/Scripts/make-icon.sh" "$CONTENTSFOLD" >/dev/null 2>&1 &
+
 # Re-check after a pause so a brief gap between game processes isn't taken as a quit.
 while :; do
     while pgrep -f "$GAME" >/dev/null; do sleep 2; done
