@@ -7,12 +7,16 @@
 #   ./install.sh --dest DIR      build into DIR instead
 #   ./install.sh --no-retina     run Wine at macOS point resolution (blurrier, faster;
 #                                the default follows your main display)
+#   --status-file FILE           also append machine-readable progress to FILE
+#                                ("step|n|total|label", then "done|app" or "error|msg");
+#                                used by the installer app
 set -euo pipefail
 
 REPO="${0:A:h}"
 APP_NAME="Order of the Sinking Star.app"
 DEST="$HOME/Applications"
 RETINA=auto
+STATUS_FILE=""
 
 TEMPLATE_URL="https://github.com/Sikarugir-App/Template/releases/download/v1.0/Template-1.0.21.tar.xz"
 TEMPLATE_SHA256="bbe996e4e4375318485953d0c7818b7b4b0a4dc1f13303bcc584f99f7602f78d"
@@ -24,13 +28,27 @@ while (( $# )); do
     case "$1" in
         --dest) DEST="$2"; shift 2 ;;
         --no-retina) RETINA=no; shift ;;
-        -h|--help) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --status-file) STATUS_FILE="$2"; shift 2 ;;
+        -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
 
-step() { print -P "%B==>%b $1"; }
-die() { print -P "%F{red}Error:%f $1" >&2; exit 1; }
+TOTAL_STEPS=7
+step_no=0
+failed=0
+status() { [[ -z "$STATUS_FILE" ]] || print -r -- "$1" >> "$STATUS_FILE"; }
+step() {
+    step_no=$((step_no + 1))
+    print -P "%B==>%b $1"
+    status "step|$step_no|$TOTAL_STEPS|$1"
+}
+die() {
+    print -P "%F{red}Error:%f $1" >&2
+    failed=1
+    status "error|$1"
+    exit 1
+}
 
 # --- Preflight -----------------------------------------------------------------
 [[ "$(sysctl -n hw.optional.arm64 2>/dev/null)" == 1 ]] || die "This needs an Apple Silicon Mac."
@@ -55,6 +73,9 @@ LOG="$HOME/Library/Logs/sinking-star-mac-install.log"
 WORK=$(mktemp -d)
 built=0
 cleanup() {
+    # Best effort: a failing step here (e.g. no Wine server left to stop) must not
+    # abort the rest of the cleanup under errexit.
+    setopt local_options no_err_exit
     rm -rf "$WORK"
     if (( ! built )) && [[ -d "$APP" ]]; then
         [[ -n "${CONTENTSFOLD:-}" && -x "$CONTENTSFOLD/SharedSupport/wine/bin/wineserver" ]] &&
@@ -62,8 +83,11 @@ cleanup() {
         rm -rf "$APP"
         print "Removed the partial app. Details are in $LOG" >&2
     fi
+    (( built || failed )) || status "error|The install stopped before finishing. Details are in $LOG"
 }
 trap cleanup EXIT
+# Stop/Ctrl-C/closing the window run the same cleanup as a failure.
+trap 'exit 1' INT TERM HUP
 
 fetch() {  # url, output, sha256 (empty to skip the check)
     curl -fL --retry 3 --progress-bar -o "$2" "$1" || die "Download failed: $1"
@@ -142,7 +166,8 @@ ss_wineserver -w 2>/dev/null || true
 "$CONTENTSFOLD/Resources/Scripts/reshim-steamwebhelper.sh" "$CONTENTSFOLD"
 
 built=1
-step "Done: $APP"
+status "done|$APP"
+print -P "%B==>%b Done: $APP"
 cat <<EOF
 
 Next:

@@ -20,14 +20,26 @@ Not affiliated with Thekla, Valve or Apple.
 
 ## Install
 
+Either way, the result is `~/Applications/Order of the Sinking Star.app`. It takes a few
+minutes, most of it Steam updating itself.
+
+### Installer app
+
+1. Download **Install Order of the Sinking Star.zip** from the Releases page and open it.
+2. Open **Install Order of the Sinking Star**. It isn't signed with an Apple Developer ID,
+   so macOS blocks it the first time: open **System Settings > Privacy & Security**,
+   scroll down and click **Open Anyway** next to the message about the app.
+3. Click **Install** and follow along. It offers to install Rosetta 2 if it's missing.
+
+### Terminal
+
 ```sh
 git clone <this repo> sinking-star-mac
 cd sinking-star-mac
 ./install.sh
 ```
 
-This builds `~/Applications/Order of the Sinking Star.app`. It takes a few minutes, most of
-it Steam updating itself. Options:
+Options:
 
 - `--dest DIR` builds the app somewhere else.
 - `--no-retina` runs Wine at macOS point resolution. It's blurrier but faster, and suits a
@@ -97,7 +109,10 @@ The game writes its own log, including frame-time stats, to
   `iconutil`. All three ship with macOS.
 
 `bundle/` is copied into the app; `bundle/steamwebhelper-shim.exe` is built from `shim/`
-with mingw-w64 (the command is at the top of the source file). `tools/d3d12probe.c` is a
+with mingw-w64 (the command is at the top of the source file). The installer app is an
+AppleScript applet (`installer/Installer.applescript`) that runs `install.sh` with
+`--status-file` and shows its progress; `./make-installer-app.sh` builds it and the
+release zip into `dist/`. `tools/d3d12probe.c` is a
 small diagnostic that prints what the DirectX 12 stack reports.
 
 ## Credits and licenses
