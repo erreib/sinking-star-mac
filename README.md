@@ -79,6 +79,9 @@ The game writes its own log, including frame-time stats, to
 
 - **The Steam window is black.** A Steam update replaced the webhelper shim while Steam
   was running. Quit and reopen the app; it re-applies the shim on every launch.
+- **Steam or the menu-bar icon stays after you quit the game.** The app normally closes
+  everything about 20 seconds after the game exits. What it did is logged in
+  `~/Library/Logs/Order of the Sinking Star - session.log`.
 - **The installer refuses to start because a Wine server is running.** Quit CrossOver,
   Whisky, other Wine wrappers or a running copy of this app. Sikarugir's setup waits
   until no Wine session is running anywhere.
@@ -106,7 +109,9 @@ The game writes its own log, including frame-time stats, to
   stay hidden, and it holds the app's launch request until you've signed in (without it,
   Steam acts on the request before sign-in and drops it). `bundle/Scripts/steam-session.sh`
   shows Steam's Downloads page while the game downloads or updates, starts the game after
-  the first download, and shuts Steam down once the game exits.
+  the first download, and shuts Steam down once the game exits. Steam's client crashes on
+  its way out under Wine and leaves its crash reporter and service running, so the script
+  then ends the app's Wine session.
 - **Icon:** the installer can't ship the game's artwork, so once Steam has installed the
   game, `bundle/Scripts/make-icon.sh` pulls the icon out of `sinking_star.exe` (Perl),
   draws it on a macOS-style rounded tile (JavaScript for Automation) and packs it with
