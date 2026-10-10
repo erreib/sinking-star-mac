@@ -19,6 +19,9 @@ MANIFEST="$SS_STEAM_DIR/steamapps/appmanifest_$SS_APPID.acf"
 GAME='^C:\\.*\\sinking_star\.exe'
 STEAM='^C:\\.*\\Steam\\steam\.exe'
 
+# Sikarugir's launcher keeps this lockfile while the app runs; its folder name is the
+# app's path with "/" spelled "xKWx".
+LOCKFILE="${SS_LOCKFILE:-$(getconf DARWIN_USER_TEMP_DIR)$(dirname "$CONTENTSFOLD" | sed 's|/|xKWx|g')/lockfile}"
 LOG="${SS_SESSION_LOG:-$HOME/Library/Logs/Order of the Sinking Star - session.log}"
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG"; }
 : > "$LOG"
@@ -36,9 +39,15 @@ steam_gone() {
 # Steam's client crashes on its way out under Wine, and its crash reporter and
 # background service then keep the Wine session (and the menu-bar icon) alive for a
 # minute or two. Nothing else in this prefix needs to keep running, so end it.
+#
+# The launcher normally deletes its lockfile when Wine ends, but opening the app again
+# mid-session makes the original launcher quit early and the file is left behind. The
+# next launch then takes Sikarugir's "already running" shortcut, which skips
+# StartupScript (and this helper), so Steam would stay up after the game. Delete it.
 end_session() {
     log "ending the Wine session ($1)"
     ss_wineserver -k
+    rm -f "$LOCKFILE"
     exit 0
 }
 
