@@ -26,7 +26,8 @@ minutes, most of it Steam updating itself.
 
 ### Installer app
 
-1. Download **Install Order of the Sinking Star.zip** from the Releases page and open it.
+1. Download **Install-Order-of-the-Sinking-Star.zip** from the
+   [latest release](https://github.com/erreib/sinking-star-mac/releases/latest) and open it.
 2. Open **Install Order of the Sinking Star**. It isn't signed with an Apple Developer ID,
    so macOS blocks it the first time: open **System Settings > Privacy & Security**,
    scroll down and click **Open Anyway** next to the message about the app.
@@ -35,7 +36,7 @@ minutes, most of it Steam updating itself.
 ### Terminal
 
 ```sh
-git clone <this repo> sinking-star-mac
+git clone https://github.com/erreib/sinking-star-mac.git
 cd sinking-star-mac
 ./install.sh
 ```

@@ -17,7 +17,8 @@ TEST_DEST=""
 [[ "${1:-}" == --test-dest ]] && TEST_DEST="$2"
 
 APP="$OUT/$NAME.app"
-rm -rf "$APP" "$OUT/$NAME.zip"
+ZIP="$OUT/Install-Order-of-the-Sinking-Star.zip"
+rm -rf "$APP" "$ZIP" "$OUT/$NAME.zip"
 mkdir -p "$OUT"
 
 src="$REPO/installer/Installer.applescript"
@@ -41,8 +42,8 @@ codesign --verify --deep --strict "$APP"
 
 if [[ -z "$TEST_DEST" ]]; then
     # No resource forks or extended attributes, so no ._ files in the zip.
-    (cd "$OUT" && ditto -c -k --norsrc --noextattr --keepParent "$NAME.app" "$NAME.zip")
-    echo "Built $OUT/$NAME.zip"
+    (cd "$OUT" && ditto -c -k --norsrc --noextattr --keepParent "$NAME.app" "$ZIP")
+    echo "Built $ZIP"
 else
     echo "Built test installer (installs into $TEST_DEST): $APP"
 fi
